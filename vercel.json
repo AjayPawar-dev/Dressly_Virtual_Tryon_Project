@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/generate-tryon.js": {
+      "maxDuration": 300,
+      "supportsCancellation": true
+    }
+  }
+}

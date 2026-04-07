@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Gradient Brand Colors ── */
+    --color-primary-purple: 131 74 176;
+    --color-primary-violet: 43 28 84;
+    --color-primary-navy: 13 24 34;
+    
+    /* shadcn adapted to gradient theme - Light */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 263 51% 58%; /* Purple ring */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+    --card: 222 47% 13%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 47% 13%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 263 51% 70%;
+  }
+}
+
+@layer base {
+  * { @apply border-border box-border; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    font-weight: 600;
+  }
+}
+
+/* ── Gradient Utilities ──────────────────────────────── */
+@layer utilities {
+  /* Text gradients */
+  .text-gradient-primary {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+  }
+
+  .text-gradient-accent {
+    @apply bg-gradient-accent bg-clip-text text-transparent;
+  }
+
+  /* Animated gradient backgrounds */
+  .bg-gradient-animated {
+    background: linear-gradient(270deg, #834ab0, #2b1c54, #0d1822);
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* Glass morphism effect */
+  .glass-card {
+    @apply bg-gradient-glass backdrop-blur-xl border border-white/10;
+  }
+
+  /* Glow effects */
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(131, 74, 176, 0.4);
+  }
+
+  .glow-purple-hover:hover {
+    box-shadow: 0 0 40px rgba(131, 74, 176, 0.6);
+  }
+}
+
+/* ── Component Styles ─────────────────────────────────── */
+@layer components {
+  /* Primary gradient button */
+  .btn-gradient-primary {
+    @apply bg-gradient-primary text-white font-semibold;
+    @apply hover:bg-gradient-primary-hover;
+    @apply shadow-lg hover:shadow-glow-purple;
+    @apply transition-all duration-300;
+  }
+
+  /* Glass card */
+  .card-gradient {
+    @apply bg-gradient-card border border-white/10;
+    @apply backdrop-blur-sm;
+    @apply hover:bg-gradient-card-hover;
+    @apply transition-all duration-300;
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
