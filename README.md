@@ -60,6 +60,7 @@ Optional:
 - `.env.local` is ignored and should not be committed
 - `dist/` is generated output and should not be committed
 - `node_modules/` is ignored
+- See `RELEASE_CHECKLIST.md` before pushing or deploying
 
 ## Deployment Notes
 
