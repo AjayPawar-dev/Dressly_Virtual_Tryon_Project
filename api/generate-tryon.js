@@ -26,6 +26,18 @@ function getBearerToken(req) {
   return authHeader.slice('Bearer '.length);
 }
 
+function getSupabaseConfig() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey =
+    process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return { supabaseUrl, supabaseAnonKey };
+}
+
 async function readJsonBody(req) {
   if (req.body) {
     return typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
@@ -50,13 +62,7 @@ async function readJsonBody(req) {
 }
 
 function createServerSupabase(accessToken) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
+  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
 
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: accessToken
@@ -103,6 +109,23 @@ function isStorageReference(value) {
   );
 }
 
+function encodeStoragePath(path) {
+  return path
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+}
+
+function buildPublicStorageUrl(fileRef) {
+  const { supabaseUrl } = getSupabaseConfig();
+  const publicUrl = new URL(
+    `/storage/v1/object/public/${fileRef.bucket}/${encodeStoragePath(fileRef.path)}`,
+    supabaseUrl
+  );
+
+  return publicUrl.toString();
+}
+
 async function fetchRequiredBlob(url, label) {
   const response = await fetch(url);
 
@@ -125,15 +148,26 @@ async function downloadStoredBlob(accessToken, fileRef, label) {
     .from(fileRef.bucket)
     .download(fileRef.path);
 
-  if (error) {
-    throw new Error(`Failed to download ${label}: ${error.message}`);
+  if (data && data.size > 0) {
+    return data;
   }
 
-  if (!data || data.size === 0) {
-    throw new Error(`${label} is empty`);
-  }
+  const storageFailure = error?.message || `${label} is empty`;
+  const publicUrl = buildPublicStorageUrl(fileRef);
 
-  return data;
+  try {
+    const blob = await fetchRequiredBlob(publicUrl, `${label} from public storage`);
+
+    console.warn(
+      `Falling back to public storage fetch for ${label}: ${storageFailure}`
+    );
+
+    return blob;
+  } catch (fallbackError) {
+    throw new Error(
+      `Failed to download ${label}: ${storageFailure}. Public fallback failed: ${fallbackError.message}`
+    );
+  }
 }
 
 async function resolveImageBlob(accessToken, imageSource, label) {
